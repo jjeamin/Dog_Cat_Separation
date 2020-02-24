@@ -28,6 +28,8 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 # model
 model = Model().to(device)
 
+model.load_state_dict(torch.load(save_path))
+
 # cost
 criterion = torch.nn.CrossEntropyLoss().to(device)
 
@@ -61,7 +63,7 @@ for e in range(n_epoch):
     train_acc = n_train_correct / (train_iter * batch_size)
     train_loss = train_loss / train_iter
 
-    print(f"[TRAIN ACCURACY / {train_acc}] [TRAIN_LOSS / {train_loss}]")
+    print(f"[TRAIN Acc / {train_acc}] [TRAIN Loss / {train_loss}]")
 
     if train_acc > best_acc:
         print("model saved")
