@@ -1,17 +1,27 @@
+import os
+import numpy as np
+import matplotlib.pyplot as plt
 from src.search import Search
+from src.utils import get_cat_dog_path
 
-MODEL_PATH = './models/model.pth'
-IMAGE_ROOT_PATH = './datasets/test/'
-number = 4211
-IMAGE_NAME = [f'dog.{number}.jpg', f'cat.{number}.jpg']
 
-for name in IMAGE_NAME:
-    # backprop & get gradient
-    search = Search(MODEL_PATH,
-                    IMAGE_ROOT_PATH,
-                    name)
+model_path = './models/model.pth'
+cat_paths, dog_paths = get_cat_dog_path('./datasets/test/')
 
-    true_grad = search.backprop()
-    false_grad = search.backprop(inverse=True)
+# backprop & get gradient
+cat_search = Search(model_path,
+                    cat_paths,
+                    0)
+# backprop & get gradient
+dog_search = Search(model_path,
+                    dog_paths,
+                    1)
+cat_total_diffs = cat_search.get_diffs()
+dog_total_diffs = dog_search.get_diffs()
 
-    search.diff_show(true_grad, false_grad)
+
+for i, j in zip(dog_total_diffs, cat_total_diffs):
+    plt.plot(i)
+    plt.plot(j)
+    plt.show()
+
