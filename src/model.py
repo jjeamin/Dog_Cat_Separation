@@ -2,6 +2,20 @@ import torch
 import torch.nn as nn
 
 
+def load_model(path, mode='eval', device='cuda'):
+    model = Model().to(device)
+    model.load_state_dict(torch.load(path))
+
+    if mode == 'train':
+        model.train()
+    elif mode == 'eval':
+        model.eval()
+    else:
+        AssertionError("MODE is only train and eval")
+
+    return model
+
+
 class Model(nn.Module):
     def __init__(self):
         super(Model, self).__init__()

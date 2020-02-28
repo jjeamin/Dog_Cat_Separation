@@ -1,9 +1,8 @@
 import torch
-import torch.optim as optim
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-from loader import DogCat
-from model import Model
+from datasets.loader import DogCat
+from src.model import Model
 from tqdm import tqdm
 
 if torch.cuda.is_available():
@@ -15,7 +14,7 @@ else:
 
 batch_size = 32
 
-load_path = './model.pth'
+load_path = './models/model.pth'
 
 transformer = transforms.Compose([transforms.Resize((128, 128)),
                                   transforms.ToTensor()])
@@ -38,6 +37,9 @@ test_iter = len(test_loader)
 test_loss = 0
 n_test_correct = 0
 
+dog_cnt = 0
+cat_cnt = 0
+
 for i, (images, labels) in tqdm(enumerate(test_loader), total=test_iter):
     images, labels = images.to(device), labels.to(device)
 
@@ -45,12 +47,24 @@ for i, (images, labels) in tqdm(enumerate(test_loader), total=test_iter):
     pred = model(images)
     # acc
     _, predicted = torch.max(pred, 1)
+
+    for l, p in zip(labels, predicted):
+        if l.item() == 0:
+            if p.item() == l.item():
+                cat_cnt += 1
+        else:
+            if p.item() == l.item():
+                dog_cnt += 1
+
     n_test_correct += (predicted == labels).sum().item()
     # loss
     loss = criterion(pred, labels)
     test_loss += loss.item()
 
-test_acc = n_test_correct / (test_iter * batch_size)
-test_loss = test_loss / test_iter
+    test_acc = n_test_correct / (test_iter * batch_size)
+    test_loss = test_loss / test_iter
 
-print(f"[TEST Acc / {test_acc}] [TEST Loss / {test_loss}]")
+    print(f"[TEST Acc / {test_acc}] [TEST Loss / {test_loss}]")
+
+print(dog_cnt)
+print(cat_cnt)
