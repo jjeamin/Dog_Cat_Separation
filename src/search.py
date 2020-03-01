@@ -1,22 +1,21 @@
-import os
 import torch
-from torch.nn import functional as F
 import torch.nn as nn
 import numpy as np
+import matplotlib.pyplot as plt
 from PIL import Image
+from torch.nn import functional as F
 from src.model import load_model
-from src.utils import pil_imshow, pil_to_tensor
+from src.utils import pil_to_tensor
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 class Search(object):
     def __init__(self,
-                 model_path,
+                 model,
                  image_paths,
-                 label,
-                 mode='eval'):
-        self.model = load_model(model_path, mode)
+                 label):
+        self.model = model
         self.image_paths = image_paths
         self.label = label
         self.total_diffs = 0
@@ -60,7 +59,6 @@ class Search(object):
         if pred is not self.label:
             return None
 
-        print(pred)
         """
         # 0, 1
         if inverse:
@@ -110,3 +108,40 @@ class Search(object):
         self.set_diffs()
         print(self.using)
         return self.total_diffs
+
+
+def get_filter_idx(model, cat_paths, dog_paths, show=False):
+    # backprop & get gradient
+    cat_search = Search(model,
+                        cat_paths,
+                        0)
+    # backprop & get gradient
+    dog_search = Search(model,
+                        dog_paths,
+                        1)
+
+    cat_total_diffs = cat_search.get_diffs()
+    dog_total_diffs = dog_search.get_diffs()
+
+    cat_filter = [[] for _ in range(len(cat_total_diffs))]
+    dog_filter = [[] for _ in range(len(dog_total_diffs))]
+
+    for i, (dog, cat) in enumerate(zip(dog_total_diffs, cat_total_diffs)):
+        for j, (d, c) in enumerate(zip(dog, cat)):
+            if d > 0 and c > 0:
+                cat_filter[i].append(j)
+                dog_filter[i].append(j)
+            elif d > 0:
+                cat_filter[i].append(j)
+            elif c > 0:
+                dog_filter[i].append(j)
+            else:
+                dog_filter[i].append(j)
+
+        if show:
+            plt.plot(dog, label="Dog")
+            plt.plot(cat, label="Cat")
+            plt.legend()
+            plt.show()
+
+    return cat_filter, dog_filter

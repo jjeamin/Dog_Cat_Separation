@@ -24,14 +24,11 @@ test_loader = DataLoader(test_dateset, batch_size=batch_size, shuffle=True)
 
 # model
 model = Model().to(device)
-
 model.load_state_dict(torch.load(load_path))
-
 model.eval()
 
 # cost
 criterion = torch.nn.CrossEntropyLoss().to(device)
-
 test_iter = len(test_loader)
 
 test_loss = 0
@@ -65,6 +62,3 @@ for i, (images, labels) in tqdm(enumerate(test_loader), total=test_iter):
     test_loss = test_loss / test_iter
 
     print(f"[TEST Acc / {test_acc}] [TEST Loss / {test_loss}]")
-
-print(dog_cnt)
-print(cat_cnt)

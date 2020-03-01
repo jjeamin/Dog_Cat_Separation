@@ -1,4 +1,5 @@
 import os
+import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
@@ -81,3 +82,15 @@ def show_feature(feature):
             cnt += 1
 
     plt.show()
+
+
+def save_pkl(data, path):
+    with open(path, 'wb') as f:
+        pickle.dump(data, f)
+
+
+def load_pkl(path):
+    with open(path, 'rb') as f:
+        data = pickle.load(f)  # 단 한줄씩 읽어옴
+
+    return data
