@@ -42,7 +42,7 @@ class Fusion_Search(object):
 
 
 model_path = './models/model.pth'
-mix_paths= get_path('./datasets/mix/')
+mix_paths = get_path('./datasets/mix/')
 
 search = Fusion_Search(model_path,
                        mix_paths)

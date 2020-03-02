@@ -13,11 +13,11 @@ else:
     device = 'cpu'
     torch.set_default_tensor_type('torch.FloatTensor')
 
-lr = 0.001
-n_epoch = 30
+lr = 0.01
+n_epoch = 100
 batch_size = 64
 
-save_path = './models/model.pth'
+save_path = './models/model3.pth'
 
 transformer = transforms.Compose([transforms.Resize((128, 128)),
                                   transforms.RandomHorizontalFlip(),
@@ -32,13 +32,16 @@ test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # model
 model = Model().to(device)
-model.load_state_dict(torch.load(save_path))
+#model.load_state_dict(torch.load(save_path))
 
 # cost
 criterion = torch.nn.CrossEntropyLoss().to(device)
 
 # optimizer/scheduler
 optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
+scheduler = optim.lr_scheduler.MultiStepLR(optimizer=optimizer,
+                                           milestones=[20, 50, 80],
+                                           gamma=0.1)
 
 train_iter = len(train_loader)
 test_iter = len(test_loader)
@@ -50,6 +53,7 @@ for e in range(n_epoch):
     n_train_correct = 0
     n_test_correct = 0
 
+    scheduler.step()
     for i, (images, labels) in tqdm(enumerate(train_loader), total=train_iter):
         images, labels = images.to(device), labels.to(device)
 

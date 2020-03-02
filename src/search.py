@@ -4,8 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from torch.nn import functional as F
-from src.model import load_model
-from src.utils import pil_to_tensor
+from src.utils import get_cat_dog_path, save_pkl, pil_to_tensor
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -128,15 +127,17 @@ def get_filter_idx(model, cat_paths, dog_paths, show=False):
 
     for i, (dog, cat) in enumerate(zip(dog_total_diffs, cat_total_diffs)):
         for j, (d, c) in enumerate(zip(dog, cat)):
-            if d > 0 and c > 0:
+            if i == 0:
                 cat_filter[i].append(j)
-                dog_filter[i].append(j)
-            elif d > 0:
-                cat_filter[i].append(j)
-            elif c > 0:
                 dog_filter[i].append(j)
             else:
-                dog_filter[i].append(j)
+                if d > 0 and c > 0:
+                     cat_filter[i].append(j)
+                     dog_filter[i].append(j)
+                elif d > 0:
+                     cat_filter[i].append(j)
+                elif c > 0:
+                     dog_filter[i].append(j)
 
         if show:
             plt.plot(dog, label="Dog")
@@ -145,3 +146,16 @@ def get_filter_idx(model, cat_paths, dog_paths, show=False):
             plt.show()
 
     return cat_filter, dog_filter
+
+
+def gen_filter_idx(model, dataset_path):
+    cat_paths, dog_paths = get_cat_dog_path(dataset_path)
+    cat_filter, dog_filter = get_filter_idx(model,
+                                            cat_paths,
+                                            dog_paths)
+
+    for c, d in zip(cat_filter, dog_filter):
+        print(f"[Num of Cat Filter : {len(c)}] [Num of Dog Filter : {len(d)}]")
+
+    save_pkl(cat_filter, "./pkl/cat_filter.pkl")
+    save_pkl(dog_filter, "./pkl/dog_filter.pkl")
