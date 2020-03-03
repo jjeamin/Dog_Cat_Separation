@@ -3,7 +3,7 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from datasets.loader import DogCat
-from src.model import Model
+from src.vgg import VGG
 from tqdm import tqdm
 
 if torch.cuda.is_available():
@@ -17,7 +17,7 @@ lr = 0.01
 n_epoch = 100
 batch_size = 64
 
-save_path = './models/model3.pth'
+save_path = './models/vgg11.pth'
 
 transformer = transforms.Compose([transforms.Resize((128, 128)),
                                   transforms.RandomHorizontalFlip(),
@@ -31,7 +31,7 @@ test_dataset = DogCat(dataType='test', transformer=transformer)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # model
-model = Model().to(device)
+model = VGG('VGG11').to(device)
 #model.load_state_dict(torch.load(save_path))
 
 # cost

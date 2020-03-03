@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from torch.nn import functional as F
-from src.utils import get_cat_dog_path, save_pkl, pil_to_tensor
+from src.utils import get_cat_dog_path, pil_to_tensor
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -109,11 +109,12 @@ class Search(object):
         return self.total_diffs
 
 
-def get_filter_idx(model, cat_paths, dog_paths, show=False):
+def get_filter_idx(model, cat_paths, dog_paths, show=True):
     # backprop & get gradient
     cat_search = Search(model,
                         cat_paths,
                         0)
+
     # backprop & get gradient
     dog_search = Search(model,
                         dog_paths,
@@ -127,17 +128,22 @@ def get_filter_idx(model, cat_paths, dog_paths, show=False):
 
     for i, (dog, cat) in enumerate(zip(dog_total_diffs, cat_total_diffs)):
         for j, (d, c) in enumerate(zip(dog, cat)):
-            if i == 0:
+            if i < 2:
                 cat_filter[i].append(j)
                 dog_filter[i].append(j)
+
             else:
-                if d > 0 and c > 0:
-                     cat_filter[i].append(j)
-                     dog_filter[i].append(j)
-                elif d > 0:
-                     cat_filter[i].append(j)
-                elif c > 0:
-                     dog_filter[i].append(j)
+                if d > c:
+                    cat_filter[i].append(j)
+                else:
+                    dog_filter[i].append(j)
+                # if d > 0 and c > 0:
+                #      cat_filter[i].append(j)
+                #      dog_filter[i].append(j)
+                # elif d > 0:
+                #      cat_filter[i].append(j)
+                # elif c > 0:
+                #      dog_filter[i].append(j)
 
         if show:
             plt.plot(dog, label="Dog")
@@ -157,5 +163,4 @@ def gen_filter_idx(model, dataset_path):
     for c, d in zip(cat_filter, dog_filter):
         print(f"[Num of Cat Filter : {len(c)}] [Num of Dog Filter : {len(d)}]")
 
-    save_pkl(cat_filter, "./pkl/cat_filter.pkl")
-    save_pkl(dog_filter, "./pkl/dog_filter.pkl")
+    return cat_filter, dog_filter
