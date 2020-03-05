@@ -133,17 +133,13 @@ def get_filter_idx(model, cat_paths, dog_paths, show=True):
                 dog_filter[i].append(j)
 
             else:
-                if d > c:
-                    cat_filter[i].append(j)
-                else:
-                    dog_filter[i].append(j)
-                # if d > 0 and c > 0:
-                #      cat_filter[i].append(j)
-                #      dog_filter[i].append(j)
-                # elif d > 0:
-                #      cat_filter[i].append(j)
-                # elif c > 0:
-                #      dog_filter[i].append(j)
+                if d > 0 and c > 0:
+                     cat_filter[i].append(j)
+                     dog_filter[i].append(j)
+                elif d > 0:
+                     cat_filter[i].append(j)
+                elif c > 0:
+                     dog_filter[i].append(j)
 
         if show:
             plt.plot(dog, label="Dog")
@@ -154,11 +150,12 @@ def get_filter_idx(model, cat_paths, dog_paths, show=True):
     return cat_filter, dog_filter
 
 
-def gen_filter_idx(model, dataset_path):
+def gen_filter_idx(model, dataset_path, show=True):
     cat_paths, dog_paths = get_cat_dog_path(dataset_path)
     cat_filter, dog_filter = get_filter_idx(model,
                                             cat_paths,
-                                            dog_paths)
+                                            dog_paths,
+                                            show=show)
 
     for c, d in zip(cat_filter, dog_filter):
         print(f"[Num of Cat Filter : {len(c)}] [Num of Dog Filter : {len(d)}]")

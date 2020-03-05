@@ -1,7 +1,7 @@
 import copy
-from src.utils import load_pkl ,get_logger
+from src.utils import load_pkl, get_logger
 from src.prune import *
-from src.vgg import load_model
+from src.vgg import load_model, get_index
 from src.search import gen_filter_idx
 
 if __name__ == "__main__":
@@ -13,8 +13,13 @@ if __name__ == "__main__":
 
     cls = 1
 
+    idx = get_index()
+
     for _ in range(0, 10):
-        cat_filter, dog_filter = gen_filter_idx(model, dataset_path)
+        cat_filter, dog_filter = gen_filter_idx(model, dataset_path, show=False)
+
+        for i, f in enumerate(cat_filter[:-1]):
+            idx[i] = idx[i][f]
 
         model = prune(model,
                       cat_filter,
@@ -24,7 +29,8 @@ if __name__ == "__main__":
             model = train(model, batch_size=32, logger=logger)
             test(model, batch_size=32, logger=logger)
 
-
+    for i in idx:
+        print(i)
 
     # save_pkl(cat_filter, "./pkl/cat_filter.pkl")
     # save_pkl(dog_filter, "./pkl/dog_filter.pkl")

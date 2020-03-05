@@ -1,6 +1,7 @@
 '''VGG11/13/16/19 in Pytorch.'''
 import torch
 import torch.nn as nn
+import numpy as np
 
 
 cfg = {
@@ -57,3 +58,15 @@ def load_model(path, version='VGG11', mode='eval', device='cuda'):
         AssertionError("MODE is only train and eval")
 
     return model
+
+
+def get_index(version='VGG11'):
+    idx = []
+
+    for i in cfg['VGG11']:
+        if i == 'M':
+            pass
+        else:
+            idx.append(np.arange(i))
+
+    return idx

@@ -41,7 +41,7 @@ class Fusion_Search(object):
         return self.feature
 
 
-model_path = './models/model.pth'
+model_path = './models/model3.pth'
 mix_paths = get_path('./datasets/mix/')
 
 search = Fusion_Search(model_path,
